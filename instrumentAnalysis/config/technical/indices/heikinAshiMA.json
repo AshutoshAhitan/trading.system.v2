@@ -1,0 +1,29 @@
+{
+  "dest.table": "ta.indices",
+  "dest.table.primary.keys": ["Timeframe", "Symbol", "Datetime"],
+  "symbol.src.table": "indices",
+  "symbol.src.table.column.filter": {
+    "Symbol" : "NIFTY 50",
+    "Timeframe": "1m"
+  },
+  "symbol.src.table.column.select": "Symbol",
+  "symbol.data.table": "indices",
+  "symbol.data.table.column.filter": {},
+  "symbol.data.column.orderby": "\"Datetime\" desc",
+  "symbol.data.limit" : 1200,
+  "ma.latest_value_only": true,
+  "ma.column": "HA_Close",
+  "ma.period": [
+    [1, "ema"],
+    [3, "ema"],
+    [5, "ema"]
+  ],
+  "__ma.period__": [
+    [1, "ema"],
+    [3, "ema"],
+    [5, "ema"],
+    [10, "ema"],
+    [21, "ema"],
+    [45, "ema"]
+  ]
+}

@@ -1,0 +1,122 @@
+{
+  "fundamentals": {
+    "marketCap.fetch": true,
+    "industryInfo.fetch": true,
+    "securityInfo.fetch": true,
+    "earningsCalender.fetch": true,
+    "screener.fetch": true,
+    "nse.fetch": true
+  },
+  "symbol.src.table": "strategy",
+  "symbol.src.table.column.filter": { "buyDate": "2024-12-24" },
+  "symbol.src.table.column.select": "symbol",
+  "dest.table": "fundamentals",
+  "dest.table.truncate": false,
+  "dest.table.primary.keys": ["symbol"],
+  "nse": {
+    "host": "https://www.nseindia.com/",
+    "headers": {
+      "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko)"
+    },
+    "marketCap": "api/quote-equity?symbol={symbol}&section=trade_info",
+    "industryInfo": "api/quote-equity?symbol={symbol}",
+    "securityInfo": "api/quote-equity?symbol={symbol}",
+    "earnings.calender": "/api/corporates-financial-results?index=equities&symbol={symbol}&period=Quarterly",
+    "earnings.calender.desired_keys": [
+      "relatingTo",
+      "exchdisstime",
+      "broadCastDate",
+      "fromDate",
+      "toDate",
+      "consolidated"
+    ]
+  },
+  "screener": {
+    "host": "https://www.screener.in/",
+    "headers": {
+      "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko)"
+    },
+    "equity.fundamentals": "/company/{symbol}/consolidated",
+    "scrapper.sector": {
+      "root.html.tag": "section",
+      "root.html.attr": "id:peers",
+      "css.selector": [
+        "#peers > div.flex.flex-space-between > div:nth-child(1) > p",
+        "#peers > div:nth-child(1) > div:nth-child(1) > p:nth-child(2)"
+      ]
+    },
+    "scrapper.shareholdingPattern": {
+      "root.html.tag": "section",
+      "root.html.attr": "id:shareholding",
+      "table.header.css.selector": [
+        "#quarterly-shp > div > table > thead",
+        "#quarterly-shp > div:nth-child(1) > table:nth-child(1) > thead:nth-child(1)"
+      ],
+      "table.body.css.selector": [
+        "#quarterly-shp > div > table > tbody",
+        "#quarterly-shp > div:nth-child(1) > table:nth-child(1) > tbody:nth-child(2)"
+      ]
+    },
+    "scrapper.quarterlyResults": {
+      "root.html.tag": "section",
+      "root.html.attr": "id:quarters",
+      "table.header.css.selector": [
+        "#quarters > div:nth-child(3) > table:nth-child(1) > thead:nth-child(1)",
+        "#quarters > div:nth-child(2) > table:nth-child(1) > thead:nth-child(1)"
+      ],
+      "table.body.css.selector": [
+        "#quarters > div:nth-child(3) > table:nth-child(1) > tbody:nth-child(2)",
+        "#quarters > div:nth-child(2) > table:nth-child(1) > tbody:nth-child(2)"
+      ],
+      "quarterly.results.relevant_keys": [
+        "Sales",
+        "Revenue",
+        "Expenses",
+        "Net Profit",
+        "EPS in Rs"
+      ]
+    },
+    "scrapper.annualResults": {
+      "root.html.tag": "section",
+      "root.html.attr": "id:profit-loss",
+      "table.header.css.selector": [
+        "#profit-loss > div:nth-child(3) > table:nth-child(1) > thead:nth-child(1)",
+        "#profit-loss > div:nth-child(2) > table:nth-child(1) > thead:nth-child(1)"
+      ],
+      "table.body.css.selector": [
+        "#profit-loss > div:nth-child(3) > table:nth-child(1) > tbody:nth-child(2)",
+        "#profit-loss > div:nth-child(2) > table:nth-child(1) > tbody:nth-child(2)"
+      ],
+      "annual.results.relevant_keys": [
+        "Sales",
+        "Revenue",
+        "Expenses",
+        "Net Profit",
+        "EPS in Rs"
+      ]
+    }
+  },
+  "yfinance": {
+    "host": "https://finance.yahoo.com/",
+    "headers": {
+      "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko)"
+    },
+    "dest.table": "earnings.calender",
+    "dest.table.truncate": false,
+    "dest.table.primary.keys": ["symbol", "datetime", "company"],
+    "quarterly.results": {
+      "src.table": "fundamentals",
+      "src.table.column.filter": {},
+      "src.table.column.select": "quarterlyResults"
+    },
+    "earnings.calender": {
+      "path": "calendar/earnings/?symbol={symbol}",
+      "scrapper": {
+        "root.html.tag": "div",
+        "root.html.attr": "class:Ovx(a) Ovx(h)--print Ovy(h) W(100%) ",
+        "table.header.css.selector": "table.W\\(100\\%\\) > thead:nth-child(1)",
+        "table.body.css.selector": "table.W\\(100\\%\\) > tbody:nth-child(2)"
+      }
+    }
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "dest.table": "marketBreadth",
+  "dest.table.primary.keys": ["Symbol", "Datetime"],
+
+  "symbol.src.table": "ohlcv",
+  "symbol.src.table.column.filter": {
+    "Timeframe": "1d"
+  },
+  "symbol.src.table.column.select": "Symbol",
+  "symbol.data.table": "ohlcv",
+  "symbol.data.table.column.filter": {
+    "Timeframe": "1d"
+  },
+  "symbol.data.column.orderby": "Datetime asc"
+}

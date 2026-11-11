@@ -1,0 +1,66 @@
+{
+	"fiidii.daily": {
+		"entity": "fii-dii",
+		"src": "moneycontrol",
+		"dest.table": "DailyTradingActivity",
+		"dest.table.truncate": false,
+		"dest.table.primary.keys": [
+			"Date",
+			"timeframe"
+		],
+		"moneycontrol": {
+			"url": "www.moneycontrol.com",
+			"headers": {
+				"Host": "www.moneycontrol.com",
+				"Connection": "keep-alive"
+			},
+			"payload": "",
+			"method": "GET",
+			"path": "/stocks/marketstats/fii_dii_activity/index.php"
+		}
+	},
+	"fii.fortnightly": {
+		"entity": "fii",
+		"src": "nsdl",
+		"dest.table": "FortnightlyTradingActivity",
+		"dest.table.truncate": false,
+		"dest.table.primary.keys": [
+			"Date",
+			"sector"
+		],
+		"timeframe": "15d",
+		"period.lookback": 6,
+		"nsdl": {
+			"host": "https://www.fpi.nsdl.co.in",
+			"headers": {
+				"Host": "www.fpi.nsdl.co.in",
+				"User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36"
+			},
+			"payload": "",
+			"method": "GET",
+			"path.prefix": "/web",
+			"reportlist.path": "/Reports/FPI_Fortnightly_Selection.aspx"
+		}
+	},
+	"mf.daily": {
+		"entity": "mf",
+		"src": "sebi",
+		"dest.table": "MFTradingActivity",
+		"dest.table.truncate": false,
+		"dest.table.primary.keys": [
+			"Date",
+			"timeframe"
+		],
+		"timeframe": "1d",
+		"sebi": {
+			"host": "https://www.sebi.gov.in",
+			"headers": {
+				"Host": "www.sebi.gov.in",
+				"User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36"
+			},
+			"payload": "",
+			"method": "GET",
+			"path": "/sebiweb/other/OtherAction.do?doMfd=yes&type=2"
+		}
+	}
+}

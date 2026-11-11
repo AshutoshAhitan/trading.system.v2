@@ -1,0 +1,20 @@
+{
+    "src": "zerodha",
+    "dest.table": "stocks",
+    "dest.table.primary.keys": [
+        "instrumentToken"
+    ],
+    "exchange": [
+        "NSE"
+    ],
+    "segment": [
+        "NSE",
+        "INDICES"
+    ],
+    "type": [
+        "EQ"
+    ],
+    "zerodha.access_token": "YOUR_ZERODHA_ACCESS_TOKEN",
+    "zerodha.api.key": "YOUR_ZERODHA_API.KEY",
+    "zerodha.api.secret": "YOUR_ZERODHA_API.SECRET"
+}

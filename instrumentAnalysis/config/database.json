@@ -1,0 +1,13 @@
+{
+	"dbType": "postgres",
+	"postgres": {
+		"database": "equities",
+		"host": "localhost",
+		"port": 5432,
+		"user": "YOUR_USER",
+		"password": "YOUR_PASSWORD"
+	},
+	"sqlite": {
+		"database": "../db/equities.sqlite.db"
+	}
+}

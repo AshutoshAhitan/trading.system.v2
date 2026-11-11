@@ -1,0 +1,90 @@
+{
+    "src": "zerodha",
+    "dest.table": "ohlcv",
+    "dest.table.primary.keys": [
+        "Timeframe",
+        "Symbol",
+        "Datetime"
+    ],
+    "symbol.src.table": "stocks",
+    "symbol.src.table.column.filter": {
+        "avgTradedValue": {
+            "op": ">=",
+            "value": 70000000
+        },
+        "avgPrice": {
+            "op": ">=",
+            "value": 50
+        }
+    },
+    "symbol.src.table.column.select": "symbol",
+    "metaInfo": [
+        {
+            "period": "1y",
+            "interval": "1wk",
+            "fetch": false
+        },
+        {
+            "period": "1y",
+            "interval": "1d",
+            "fetch": true
+        },
+        {
+            "period": "2mo",
+            "interval": "60m",
+            "fetch": false
+        },
+        {
+            "period": "3d",
+            "interval": "30m",
+            "day.range": {
+                "from": "9:15:00",
+                "to": "16:00:00"
+            },
+            "fetch": false
+        },
+        {
+            "period": "3d",
+            "interval": "15m",
+            "day.range": {
+                "from": "9:15:00",
+                "to": "16:00:00"
+            },
+            "fetch": false
+        },
+        {
+            "period": "3d",
+            "interval": "10m",
+            "day.range": {
+                "from": "9:15:00",
+                "to": "16:00:00"
+            },
+            "fetch": false
+        },
+        {
+            "period": "3d",
+            "interval": "5m",
+            "day.range": {
+                "from": "9:15:00",
+                "to": "16:00:00"
+            },
+            "fetch": false
+        },
+        {
+            "period": "3d",
+            "interval": "3m",
+            "day.range": {
+                "from": "9:15:00",
+                "to": "16:00:00"
+            },
+            "fetch": false
+        }
+    ],
+    "volumeThreshold": 70000,
+    "pennyStocks": {
+        "price_definition": 30
+    },
+    "zerodha.access_token": "YOUR_ZERODHA_ACCESS_TOKEN",
+    "zerodha.api.key": "YOUR_ZERODHA_API.KEY",
+    "zerodha.api.secret": "YOUR_ZERODHA_API.SECRET"
+}

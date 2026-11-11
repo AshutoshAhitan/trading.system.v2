@@ -1,0 +1,13 @@
+{
+    "dest.table": "stocks",
+    "dest.table.primary.keys": [
+        "instrumentToken"
+    ],
+    "symbol.src.table": "stocks",
+    "symbol.src.table.column.filter": {},
+    "symbol.src.table.column.select": "instrumentToken",
+    "ohlcv.period": "1week",
+    "zerodha.access_token": "YOUR_ZERODHA_ACCESS_TOKEN",
+    "zerodha.api.key": "YOUR_ZERODHA_API.KEY",
+    "zerodha.api.secret": "YOUR_ZERODHA_API.SECRET"
+}

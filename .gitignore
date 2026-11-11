@@ -1,0 +1,10 @@
+__pycache__/
+*.py[cod]
+.vscode/
+.ropeproject/
+*.log
+log
+log.txt
+pid/
+.env
+.venv/

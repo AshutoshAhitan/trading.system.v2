@@ -1,0 +1,2 @@
+class InvalidTechnicalAnalysisName(Exception):
+    pass

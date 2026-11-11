@@ -1,0 +1,13 @@
+{
+	"url" : "www1.nseindia.com",
+	"headers" : {
+		"Host" : "www1.nseindia.com",
+		"Connection" : "keep-alive"
+	},
+	"payload"	: "",
+	"method"	: "GET",
+	"path"		: {
+		"block" : "/products/dynaContent/equities/equities/blockdeals.jsp?symbol=&segmentLink=12&symbolCount=&dateRange=24month&fromDate=&toDate=&dataType=BLOCK",
+		"bulk" : "/products/dynaContent/equities/equities/bulkdeals.jsp?symbol=&segmentLink=13&symbolCount=&dateRange=24month&fromDate=&toDate=&dataType=DEALS"
+	}
+}

@@ -1,0 +1,21 @@
+{
+  "dest.table": "ta",
+  "dest.table.primary.keys": [
+    "Timeframe",
+    "Symbol",
+    "Datetime"
+  ],
+  "symbol.src.table": "ohlcv",
+  "symbol.src.table.column.filter": {},
+  "symbol.src.table.column.select": "Symbol",
+  "symbol.data.table": "ohlcv",
+  "symbol.data.table.column.filter": {
+    "Timeframe": "1d"
+  },
+  "symbol.data.column.orderby": "Datetime asc",
+  "price.range.days": [
+    3,
+    5,
+    7
+  ]
+}

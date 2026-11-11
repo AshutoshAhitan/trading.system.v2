@@ -1,0 +1,49 @@
+{
+    "src": "zerodha",
+    "dest.table": "indices",
+    "dest.table.truncate": false,
+    "dest.table.primary.keys": [
+        "Timeframe",
+        "Symbol",
+        "Datetime"
+    ],
+    "column.rename": {
+        "Date": "Datetime"
+    },
+    "metaInfo": [
+        {
+            "period": "7d",
+            "interval": "3m"
+        }
+    ],
+    "indices.list": [
+        {
+            "index": "NIFTY 50",
+            "exchange": "NFO",
+            "symbol": "NIFTY26SEPFUT"
+        }
+    ],
+    "stream.symbol": "NIFTY26SEPFUT",
+    "index.constituent": {
+        "file": {
+            "nifty50": "./data/nse.indices/nse.nifty50.csv",
+            "nifty500": "./data/nse.indices/nse.nifty500.csv",
+            "niftylargecap100": "./data/nse.indices/nse.niftylargecap100.csv",
+            "niftymidcap150": "./data/nse.indices/nse.niftymidcap150.csv",
+            "niftysmallcap250": "./data/nse.indices/nse.niftysmallcap250.csv",
+            "niftytotalmarket": "./data/nse.indices/nse.niftytotalmarket.csv"
+        },
+        "column.rename": {
+            "Company Name": "CompanyName"
+        },
+        "dest.table": "indicesConstituent",
+        "dest.table.truncate": true,
+        "dest.table.primary.keys": [
+            "Symbol",
+            "IndexName"
+        ]
+    },
+    "zerodha.access_token": "YOUR_ZERODHA_ACCESS_TOKEN",
+    "zerodha.api.key": "YOUR_ZERODHA_API.KEY",
+    "zerodha.api.secret": "YOUR_ZERODHA_API.SECRET"
+}

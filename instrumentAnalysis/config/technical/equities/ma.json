@@ -1,0 +1,17 @@
+{
+  "dest.table": "ta",
+  "dest.table.primary.keys": ["Timeframe", "Symbol", "Datetime"],
+  "symbol.src.table": "ohlcv",
+  "symbol.src.table.column.filter": {},
+  "symbol.src.table.column.select": "Symbol",
+  "symbol.data.table": "ohlcv",
+  "symbol.data.table.column.filter": {},
+  "symbol.data.column.orderby": "\"Datetime\" asc",
+  "ma.latest_value_only": true,
+  "ma.column": "Close",
+  "ma.period": [
+    [45, "ema"],
+    [21, "ema"],
+    [10, "ema"]
+  ]
+}

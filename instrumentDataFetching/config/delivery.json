@@ -1,0 +1,21 @@
+{
+  "src": "nse",
+  "dest.table": "delivery",
+  "dest.table.primary.keys": ["Symbol", "Date"],
+  "symbol.src.table": "industriesNSE",
+  "symbol.src.table.column.filter": {},
+  "symbol.src.table.column.select": "symbol",
+  "period": "1week",
+  "period_options": ["1year", "3month", "6month", "1month", "1week"],
+  "url": "www.nseindia.com",
+  "headers": {
+    "Host": "www.nseindia.com",
+    "Connection": "keep-alive"
+  },
+  "method": "GET",
+  "path": {
+    "data": "/api/historical/securityArchives?from=from_date&to=to_date&symbol=TCS&dataType=priceVolumeDeliverable&series=ALL",
+    "cookie": "_abck=816C20057C8E01BD42C4C67468E3B070~-1~YAAQhNcLFyAKm+6TAQAASBlNVQ3vNHljE6bTLfa+3ThnCNDywwM+zlKSWE4/jvdVz8chRUFtp9A3XjP4CmVAxiFy3Xys4fD/bAAqSDyINcA5YXqm/XRO+XtrTJ58eBKVEHcASfwFqSFFlLgzQawz9YTpOv5QWmGaKlK2ouZF1NF4rRzIhUtfP823zmM7YR64NM0Dpp0cV9GC4cx4bCL2Rcy2n4wi22oppNa9jR1QZdnLjUcKAJuDvuPL1hMpdAd5AfPwLTjJLUdpcg0BzA01axfTvA+zjP9qpr8o/o9eRf2ugL1OiOf6C99i/z8l3sYcIRSTGgTSp3Y05h/W8kYC8kGxZZrWlDhv31dbgdGKO0Z5XLZLL51VTYhcUdqb93ifwbi7bchGyw==~-1~-1~-1; ak_bmsc=C9F27AD60BC959F5E190B2A7A41165F2~000000000000000000000000000000~YAAQHyozaslMiBmUAQAAW65eVRohLbwtlaCyhtbTUIuEeP0d1v6RYhkz6QSvfC42ETZjvyFbwXDdK+3PAVFIDNUf24vaE429ixNIezDETkAnCxf3nKx7cC8JyOw/lP2sp+MI0EsdUR+0XQKfb5Cu3GwvauE/lf7oHYQeEFIOtkTle87vBB8yUXdpOQ2DC2A57UVbvSDYDV0Wl11lJaMlqkgqgT/ZMBOmHFD0PwL+O0FnuD+LF5uP33yds5XnbNbCGGOIk0cPTHR0L+h9oGYh0S8j6HG8K0Ral5kFB/251fUWePcvCDP2BnErIqqE0yDE2mdOsp0Mt64ezmJALUbKgODV6q0kmtLmLl0mwLMgmWo=; bm_sz=C7E29D3C1A24A46E1D7410750C006708~YAAQhNcLFyEKm+6TAQAASRlNVRr12A8P+nGkUYMbej6JgoerO9bzFEOHeukjdCtzS7ode3w+6S++RnEeasDZaTgMIxY+LvZwQUp6iYj2+MWsU917lzHQRrIUyJ79tvq623XmwSHXRYQTB+99fcrNdYYnfkyesKk2Qh5SbXRKkDfCFH/WjsNJfUYblEyeqHqecZKlh14VgGIeCozfxyOnamKeW8L95NGpdt0k2cHJKpxEAskVUCrt4xwFTCRlZYx3z/TSo0Z8X82V+bkaWLmCztf02NoG/JHWBBGIcG9qSKmU6jXeBs9cnYJi3+EhguuRDcwZE5RqmIxj4AvS28TfMu/1LEWO15GHL5JO~3224377~4535109"
+  },
+  "payload": ""
+}

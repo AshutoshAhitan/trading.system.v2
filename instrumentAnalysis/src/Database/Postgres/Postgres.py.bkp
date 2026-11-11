@@ -1,0 +1,160 @@
+from pandas import DataFrame
+from .PostgresConnector import Connector
+from ..Database import Database
+import logging, pandas as pd
+
+class Postgres(Database):
+
+    def __init__(self, config) -> None:
+        self.cursor = Connector(config).cursor
+
+
+    def saveRecords(self, tablename, primaryKeys, records: DataFrame, truncateTable=False, truncateFromDatetime='') -> None:
+
+        if truncateTable is True:
+            self.__truncateTable(tablename, truncateFromDatetime)
+
+        # columns = self.__getTableColumns(tablename)
+        columns = self.__getRecordsColumn(records)
+        logging.debug(columns)
+
+        sql = ''
+        for idx, row in records.iterrows():
+            sql += self.__generateSql(tablename, primaryKeys, columns, row)
+
+        logging.debug(sql)
+        self.cursor.execute(sql)
+
+        return None
+
+ 
+    def fetchRecords(self, tablename, tableColumnFilter={}, tableColumnSelect=[], orderBy='', distinct=True, limit=None) -> DataFrame:
+
+        columnNames = self.__getColumnNames(tablename)
+        columnNames = ', '.join(columnNames)
+        sql = ''
+
+        select_prefix = 'SELECT'
+        if distinct:
+            select_prefix = 'SELECT DISTINCT'
+
+
+
+        if len(tableColumnFilter) == 0 and len(tableColumnSelect) == 0:
+            sql = f'{select_prefix} {columnNames} FROM "{tablename}"'
+        elif len(tableColumnFilter) != 0 and len(tableColumnSelect) == 0:
+            sql = f'{select_prefix} {columnNames} FROM "{tablename}" {self.__generateWhereClause(tableColumnFilter)}'
+        elif len(tableColumnFilter) == 0 and len(tableColumnSelect) != 0:
+            sql = f'{select_prefix} {self.__generateSelectClause(tableColumnSelect)[7:]} FROM "{tablename}"'
+        elif len(tableColumnFilter) != 0 and len(tableColumnSelect) != 0:
+            sql = f'{select_prefix} {self.__generateSelectClause(tableColumnSelect)[7:]} FROM "{tablename}" {self.__generateWhereClause(tableColumnFilter)}'
+
+        if len(orderBy) != 0:
+            sql += f' ORDER BY {orderBy}'
+
+        if limit is not None:
+            sql += f' LIMIT {limit}'
+
+        logging.debug(sql)
+        self.cursor.execute(sql)
+
+        rows = self.cursor.fetchall()
+        rows = pd.DataFrame([i.copy() for i in rows])
+
+        return rows
+
+    def __generateWhereClause(self, columnKeyValuePairs):
+
+        whereClause = ' WHERE '
+        for aKey in columnKeyValuePairs:
+            whereClause += f' "{aKey}"=\'{columnKeyValuePairs[aKey]}\' AND'
+
+        whereClause = ' '.join(whereClause.split()[:-1])
+        logging.debug(f'> where clause : {whereClause}')
+        return whereClause
+
+
+    def __generateSelectClause(self, columnNames):
+
+        selectClause = ' SELECT '
+        for aName in columnNames:
+            selectClause += f' \"{aName}\",'
+
+        selectClause = selectClause[:-1]
+        logging.debug(f'> select clause : {selectClause}')
+        return selectClause
+
+
+    def __generateSql(self, tablename, primaryKeys, columns, row):
+
+        primaryKeys = [f'"{key}"' for key in primaryKeys]
+        primaryKeys = ",".join(primaryKeys)
+
+        # columnNames = self.__getColumnNames(tablename)
+        columnNames = [f'"{column_name}"' for column_name, _ in columns]
+
+
+        sql = f"INSERT INTO \"{tablename}\" ( {', '.join(columnNames)} ) VALUES "
+
+        values = []
+        for column_name, data_type in columns:
+            if data_type in ['character varying', 'time without time zone', 
+                             'date', 'json', 'time with time zone', 'timestamp without time zone',
+                             'timestamp with time zone', 'object', 'datetime64[ns]']:
+                values.append("'{}'".format(row[column_name]))
+            else:
+                values.append("{}".format(row[column_name]))
+
+        sql += f" ({', '.join(values)}) ON CONFLICT({primaryKeys}) DO UPDATE SET {self.__columnUpdate(columnNames, values)}; "
+
+        return sql
+
+
+
+
+    def __columnUpdate(self, columns, values):
+        columnUpdateClause = [f'{columnName}={ColumnValue}' for columnName, ColumnValue in list(zip(columns, values))]
+        columnUpdateClause = ", ".join(columnUpdateClause)
+        return columnUpdateClause;
+
+
+    def __getTableColumns(self, tablename):
+
+        self.cursor.execute(f"SELECT column_name, data_type FROM information_schema.columns WHERE table_name = '{tablename}';")
+        result = self.cursor.fetchall()
+
+        columns = []
+        for row in result:
+            columns.append((row['column_name'], row['data_type']))
+
+        logging.debug(f'> table {tablename} has columns : {columns}')
+
+        return columns
+
+
+    def __getRecordsColumn(self, records):
+        columns = []
+
+        columnNames = records.dtypes.keys().to_list()
+        for aColumnName in columnNames:
+            columns.append((aColumnName, str(records.dtypes[aColumnName])))
+
+        logging.debug(f'records has columns : {columns}')
+        return columns
+
+
+    def __getColumnNames(self, tablename):
+
+        columns = self.__getTableColumns(tablename)
+        columnNames = [f'"{column_name}"' for column_name, _ in columns]
+
+        return columnNames
+
+
+    def __truncateTable(self, tablename, datetime):
+        if datetime == '':
+            self.cursor.execute(f"DELETE FROM \"{tablename}\"")
+        else:
+            self.cursor.execute(f"DELETE FROM \"{tablename}\" WHERE \"Date\" >= '{datetime}'")
+
+

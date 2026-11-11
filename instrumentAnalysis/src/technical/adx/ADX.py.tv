@@ -1,0 +1,184 @@
+import numpy as np
+import pandas as pd
+from pandas.core.frame import DataFrame
+from ..Technical import Technical
+import logging
+
+
+class ADX(Technical):
+
+    def __init__(self, configurations, dbConfigPath, symbolList) -> None:
+        super().__init__(configurations, dbConfigPath, symbolList)
+        self.adx_length = configurations.get('adx_length', 14)  # ADX Smoothing
+        self.di_length = configurations.get('di_length', 14)    # DI Length
+        # Fallback to 'period' if old config format
+        if 'period' in configurations:
+            self.adx_length = configurations['period']
+            self.di_length = configurations['period']
+
+
+    def perform(self, data: DataFrame) -> DataFrame:
+        """
+        Calculate ADX (Average Directional Index) based on TradingView implementation
+        
+        ADX measures trend strength on a scale of 0-100
+        - Values above 25 indicate strong trend
+        - Values below 20 indicate weak/no trend
+        """
+        
+        analysedData = DataFrame(data)
+        
+        # Calculate ADX and directional indicators
+        adx_value, plus_di, minus_di = self.__calculate_adx(data)
+        
+        analysedData['adx'] = adx_value
+        analysedData['posDI'] = plus_di
+        analysedData['posDISlope'] = plus_di.diff().round(2)
+        analysedData['negDI'] = minus_di
+        analysedData['negDISlope'] = minus_di.diff().round(2)
+        
+        # Fill NaN values with 0
+        analysedData = analysedData.fillna(0)
+        
+        # logging.debug(f'ADX calculation completed. ADX range: {adx_value.min():.2f} - {adx_value.max():.2f}')
+        
+        return analysedData
+
+
+    def __rma(self, src: pd.Series, length: int) -> pd.Series:
+        """
+        RMA (Running Moving Average) - Wilder's smoothing method
+        This is equivalent to TradingView's ta.rma
+        
+        Formula: alpha = 1/length
+                 rma = alpha * src + (1 - alpha) * rma[1]
+                 First value uses SMA
+        """
+        alpha = 1.0 / length
+        rma = pd.Series(index=src.index, dtype=float)
+        
+        # Initialize with SMA for the first 'length' values
+        sma_initial = src.rolling(window=length, min_periods=length).mean()
+        
+        for i in range(len(src)):
+            if i < length - 1:
+                rma.iloc[i] = np.nan
+            elif i == length - 1:
+                rma.iloc[i] = sma_initial.iloc[i]
+            else:
+                if pd.notna(rma.iloc[i-1]):
+                    rma.iloc[i] = alpha * src.iloc[i] + (1 - alpha) * rma.iloc[i-1]
+                else:
+                    rma.iloc[i] = src.iloc[i]
+        
+        return rma
+
+
+    def __true_range(self, high: pd.Series, low: pd.Series, close: pd.Series) -> pd.Series:
+        """
+        Calculate True Range (TR)
+        TR = max(high - low, abs(high - prev_close), abs(low - prev_close))
+        """
+        prev_close = close.shift(1)
+        
+        tr1 = high - low
+        tr2 = (high - prev_close).abs()
+        tr3 = (low - prev_close).abs()
+        
+        tr = pd.concat([tr1, tr2, tr3], axis=1).max(axis=1)
+        
+        return tr
+
+
+    def __directional_movement(self, high: pd.Series, low: pd.Series, length: int):
+        """
+        Calculate Plus and Minus Directional Movement indicators
+        Based on TradingView's dirmov function
+        
+        Returns: (plusDI, minusDI)
+        """
+        # Calculate price changes
+        up = high.diff()
+        down = -low.diff()
+        
+        # Calculate directional movements
+        plus_dm = pd.Series(0.0, index=high.index)
+        minus_dm = pd.Series(0.0, index=high.index)
+        
+        # plusDM: up > down and up > 0
+        plus_dm = np.where((up > down) & (up > 0), up, 0.0)
+        
+        # minusDM: down > up and down > 0
+        minus_dm = np.where((down > up) & (down > 0), down, 0.0)
+        
+        plus_dm = pd.Series(plus_dm, index=high.index)
+        minus_dm = pd.Series(minus_dm, index=high.index)
+        
+        # Calculate true range
+        close = high.index.to_series().map(lambda x: high[x])  # Placeholder, will use actual close
+        
+        return plus_dm, minus_dm
+
+
+    def __calculate_adx(self, ohlcv: DataFrame):
+        """
+        Calculate ADX and directional indicators
+        Based on TradingView's ADX implementation
+        
+        Returns: (adx, plusDI, minusDI)
+        """
+        high = ohlcv['High']
+        low = ohlcv['Low']
+        close = ohlcv['Close']
+        
+        # Calculate price changes
+        up = high.diff()
+        down = -low.diff()
+        
+        # Calculate directional movements
+        plus_dm = np.where((up > down) & (up > 0), up, 0.0)
+        minus_dm = np.where((down > up) & (down > 0), down, 0.0)
+        
+        plus_dm = pd.Series(plus_dm, index=high.index)
+        minus_dm = pd.Series(minus_dm, index=high.index)
+        
+        # Calculate true range
+        tr = self.__true_range(high, low, close)
+        
+        # Smooth true range with RMA
+        tr_rma = self.__rma(tr, self.di_length)
+        
+        # Smooth directional movements with RMA
+        plus_dm_rma = self.__rma(plus_dm, self.di_length)
+        minus_dm_rma = self.__rma(minus_dm, self.di_length)
+        
+        # Calculate directional indicators (DI+ and DI-)
+        plus_di = 100 * plus_dm_rma / tr_rma
+        minus_di = 100 * minus_dm_rma / tr_rma
+        
+        # Handle division by zero
+        plus_di = plus_di.replace([np.inf, -np.inf], np.nan)
+        minus_di = minus_di.replace([np.inf, -np.inf], np.nan)
+        
+        # Use fixnan equivalent (forward fill then backward fill)
+        plus_di = plus_di.fillna(method='ffill').fillna(method='bfill').fillna(0)
+        minus_di = minus_di.fillna(method='ffill').fillna(method='bfill').fillna(0)
+        
+        # Calculate ADX
+        di_sum = plus_di + minus_di
+        di_diff = (plus_di - minus_di).abs()
+        
+        # Avoid division by zero
+        dx = 100 * di_diff / di_sum.replace(0, 1)
+        dx = dx.replace([np.inf, -np.inf], np.nan)
+        
+        # Smooth DX with RMA to get ADX
+        adx = self.__rma(dx, self.adx_length)
+        
+        # Round values for cleaner output
+        adx = adx.round(2)
+        plus_di = plus_di.round(2)
+        minus_di = minus_di.round(2)
+        
+        return adx, plus_di, minus_di
+

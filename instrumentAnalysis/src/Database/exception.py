@@ -1,0 +1,2 @@
+class DataSinkException(Exception):
+	pass

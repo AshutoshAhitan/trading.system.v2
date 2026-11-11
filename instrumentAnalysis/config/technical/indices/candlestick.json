@@ -1,0 +1,23 @@
+{
+  "dest.table": "ta.indices",
+  "dest.table.primary.keys": [
+    "Timeframe",
+    "Symbol",
+    "Datetime"
+  ],
+  "symbol.src.table": "indices",
+  "symbol.src.table.column.filter": {
+    "Symbol" : "NIFTY 50",
+    "Timeframe": "1m"
+  },
+  "symbol.src.table.column.select": "Symbol",
+  "symbol.data.table": "indices",
+  "symbol.data.table.column.filter": {
+  },
+  "symbol.data.column.orderby": "\"Datetime\" desc",
+  "symbol.data.limit" : 1200,
+  "candle.open" : "HA_Open",
+  "candle.high" : "HA_High",
+  "candle.low"  : "HA_Low",
+  "candle.close": "HA_Close"
+}

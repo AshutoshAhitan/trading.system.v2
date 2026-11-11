@@ -1,0 +1,91 @@
+{
+  "src": "nse",
+  "nse": {
+    "dest.table": "industriesNSE",
+    "dest.table.truncate": true,
+    "dest.table.primary.keys": [
+      "symbol"
+    ],
+    "equities.file.path": "./data",
+    "equities.file.name": "nifty-750.csv",
+    "columns.rename": {
+      "Company Name": "company",
+      "Symbol": "symbol",
+      "Industry": "industry"
+    }
+  },
+  "bse": {
+    "dest.table": "industriesBSE",
+    "dest.table.truncate": true,
+    "dest.table.primary.keys": [
+      "securityId"
+    ],
+    "equities.file.path": "./data",
+    "equities.file.name": "bse.equities.csv",
+    "columns.rename": {
+      "Security Id": "securityId",
+      "Security Name": "securityName",
+      "Industry New Name": "industry",
+      "Igroup Name": "industryGroup",
+      "ISubgroup Name": "industrySubGroup"
+    }
+  },
+  "moneycontrol": {
+    "dest.table": "industries",
+    "dest.table.truncate": true,
+    "dest.table.primary.keys": [
+      "industry",
+      "symbol"
+    ],
+    "sector": {
+      "host": "www.moneycontrol.com",
+      "headers": {
+        "Host": "www.moneycontrol.com",
+        "Connection": "keep-alive"
+      },
+      "payload": "",
+      "method": "GET",
+      "path": "/india/stockmarket/sector-classification/marketstatistics/nse/agri.html"
+    },
+    "industry": {
+      "host": "www.moneycontrol.com",
+      "headers": {
+        "Host": "www.moneycontrol.com",
+        "Connection": "keep-alive"
+      },
+      "payload": "",
+      "method": "GET"
+    }
+  },
+  "finology": {
+    "dest.table": "industries",
+    "dest.table.truncate": true,
+    "dest.table.primary.keys": [
+      "industry",
+      "symbol"
+    ],
+    "industry": {
+      "host": "ticker.finology.in",
+      "headers": {
+        "Host": "ticker.finology.in",
+        "Connection": "keep-alive"
+      },
+      "payload": "",
+      "method": "GET",
+      "path": "/sector",
+      "scraper": {
+        "headless": false,
+        "poll_css_selector": "#sectorcomplist > div.bootstrap-table.bootstrap4 > div.fixed-table-container.fixed-height",
+        "poll_css_selector_period": 5,
+        "div": "sectorcomplist",
+        "table": "companylist",
+        "headers.rename": {
+          "S.No.": "s.no",
+          "COMPANY": "company",
+          "PRICERs.": "price",
+          "MCAPCr.": "marketcap"
+        }
+      }
+    }
+  }
+}
